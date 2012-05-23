@@ -9,5 +9,6 @@
     , "useragent": "latest" 
     , "googlemaps": "latest" 
     , "node-pusher": "latest" 
+    , "heroku": "latest"
   }
 }
