@@ -1,0 +1,67 @@
+.container
+  h2 performer action
+script
+ $(document).ready(function() {
+  var socket = io.connect();
+
+  // Im wondering if connection is deprecated? Yup, its connect.
+
+  socket.on('connect', function (data) {
+    console.log("client connect EVENT FIRED");
+    console.log('geo')
+    function success(position) {
+      console.log(position);
+      socket.emit('geo', { long: position.coords.longitude, lat: position.coords.latitude });
+    }
+
+    function error(msg) {
+      console.log(msg);
+    }
+
+    if (navigator.geolocation) {
+      console.log('supported')
+      navigator.geolocation.getCurrentPosition(success, error);
+    } else {
+      error('not supported');
+    };
+  });
+
+  socket.on('message', function (data) {
+    console.dir(data);
+    console.dir(JSON.parse(data));
+    var json = JSON.parse(data);    
+
+    if (json['state'] > -1) {
+      console.log('state: ' + json.state);
+      console.log("STATE MESSAGE");
+      // fire an event
+      $.deck('go', json.state);
+    }
+    if (json.cmd) {
+      console.log('cmd: ' + json.cmd);
+      console.log("CMD MESSAGE");
+      // call deck.js api
+      $.deck(json.cmd)
+    }
+    else if (json.clients) {
+      console.log('clients: ' + json.clients);
+      console.log("CLIENT NUMBER MESSAGE");   
+      // update the DOM
+      $('#viewers').text('viewers:' + json.clients);
+    }
+    else if (json.loc) {
+      console.log('loc: ' + json.loc);
+      console.log("CLIENT loc MESSAGE");  
+      // update the DOM
+      $('#locations').append('location: ' + json.loc +'</br>');
+    }
+    else if (json.fn) {
+      console.log('callback fn: ' + json.fn);
+      console.log("FIRING SERVER DEFINED CALLBACK");
+      json.fn();
+    }
+
+    // $('#tweets').text('tweets:' + json.clients);
+
+    });
+  });
