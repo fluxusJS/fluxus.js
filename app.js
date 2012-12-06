@@ -93,7 +93,7 @@ sio.sockets.on('connection', function(client) {
   });
 
   client.on('geo', function(data) {
-	console.log('geo MESSAGE received');
+	console.log('geo MESSAGE received ');
 	console.log(data);
 	var loc = data.lat + "," + data.long
 	console.log(loc)
